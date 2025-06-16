@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Supabase - Tia Dre Adestramento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+  <style>
+    .debug-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .debug-log {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/Tia-Dre-Adestramento.png" alt="Logo com Escrita">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Voltar ao Início</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <div class="debug-container">
+      <h2>Ferramenta de Debug Supabase</h2>
+      <p>Usar esta página para testar a conexão com o Supabase e verificar se a autenticação está funcionando corretamente.</p>
+      
+      <h3>Teste de Conexão</h3>
+      <button id="test-connection">Testar Conexão com Supabase</button>
+      <div id="connection-log" class="debug-log"></div>
+      
+      <h3>Teste de Cadastro</h3>
+      <form id="debug-signup">
+        <input type="email" id="debug-email" placeholder="Email" required />
+        <input type="password" id="debug-password" placeholder="Senha" required />
+        <button type="submit">Testar Cadastro</button>
+      </form>
+      <div id="signup-log" class="debug-log"></div>
+      
+      <h3>Teste de Login</h3>
+      <form id="debug-login">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Senha" required />
+        <button type="submit">Testar Login</button>
+      </form>
+      <div id="login-log" class="debug-log"></div>
+    </div>
+  </main>
+  
+  <footer>
+    <p>Endereço: Rua dos Pets, 123 - Telefone: (11) 94251-0917</p>
+    <p>&copy; 2025 PetCare - Todos os direitos reservados</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Função para adicionar log
+    function addLog(containerId, message, isError = false) {
+      const container = document.getElementById(containerId);
+      const logEntry = document.createElement('div');
+      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEntry.className = isError ? 'error' : 'success';
+      container.appendChild(logEntry);
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicialização do cliente Supabase
+      const supabaseUrl = "https://czhablojniwloaugarfu.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aGFibG9qbml3bG9hdWdhcmZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTg5NDQsImV4cCI6MjA2NTE3NDk0NH0.Yw8t0I9X1QLhKhDaL4s_n8TzBspS_uKmp4iTMaHHeC8";
+      
+      // CORREÇÃO: Inicializar o cliente Supabase corretamente
+      const { createClient } = supabase;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+      
+      // Teste de conexão
+      document.getElementById('test-connection').addEventListener('click', async () => {
+        addLog('connection-log', 'Testando conexão com Supabase...');
+        
+        try {
+          // Teste simples para verificar se a conexão está funcionando
+          const { data, error } = await supabaseClient.from('pets').select('count()', { count: 'exact' });
+          
+          if (error) {
+            addLog('connection-log', `Erro ao conectar: ${error.message}`, true);
+          } else {
+            addLog('connection-log', `Conexão bem-sucedida! Contagem de pets: ${data[0].count}`);
+          }
+        } catch (err) {
+          addLog('connection-log', `Exceção: ${err.message}`, true);
+        }
+      });
+      
+      // Teste de cadastro
+      document.getElementById('debug-signup').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('debug-email').value;
+        const password = document.getElementById('debug-password').value;
+        
+        addLog('signup-log', `Tentando cadastrar usuário: ${email}`);
+        
+        try {
+          const { data, error } = await supabaseClient.auth.signUp({ 
+            email, 
+            password,
+            options: {
+              emailRedirectTo: window.location.origin
+            }
+          });
+          
+          if (error) {
+            addLog('signup-log', `Erro no cadastro: ${error.message}`, true);
+          } else {
+            addLog('signup-log', `Cadastro bem-sucedido! ID: ${data.user?.id}`);
+          }
+        } catch (err) {
+          addLog('signup-log', `Exceção: ${err.message}`, true);
+        }
+      });
+      
+      // Teste de login
+      document.getElementById('debug-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        addLog('login-log', `Tentando login com: ${email}`);
+        
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          
+          if (error) {
+            addLog('login-log', `Erro no login: ${error.message}`, true);
+          } else {
+            addLog('login-log', `Login bem-sucedido! ID: ${data.user?.id}`);
+          }
+        } catch (err) {
+          addLog('login-log', `Exceção: ${err.message}`, true);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adestramento e Hotel Canino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+    
+    <header>
+        <div class="logo">
+            <img src="images/Tia-Dre-Adestramento.png" alt="Logo com Escrita">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+
+        <nav>
+           <a href="login.html"><button>Login</button></a>
+           <a href="cadastro.html"><button>Cadastro</button></a>
+        </nav>
+        <div class="social">
+            <!-- Link para o Facebook -->
+            <a href="https://www.facebook.com/sua_pagina" target="blank">
+                <img src="images/facebook.png" alt="Facebook">
+            </a>
+        
+            <!-- Link para o Instagram -->
+            <a href="https://www.instagram.com/tiadre_adestra?igsh=cWx3NmxqbnlheXhx" target="blank">
+                <img src="images/instagram.png" alt="Instagram">
+            </a>
+        
+            <!-- Link para o WhatsApp com número -->
+            <a href="https://wa.me/5511942510917" target="blank">
+                <img src="images/whatsapp.png" alt="WhatsApp">
+            </a>
+        </div>
+        
+    </header>
+    
+
+    <main>
+           <div><h2>Sobre Nós</h2></div>
+        <section id="sobre" class="sobre">
+            <div class="sobre-container">
+                <img src="images/sobre.jpg" alt="Adestrador trabalhando com cães">
+                <div class="sobre-texto">
+                    <p>Tia Dre iniciou sua jornada profissional atuando em renomadas clínicas veterinárias no estado de São Paulo, onde desenvolveu habilidades e empatia com os animais.</p>
+                    <p>Após anos de experiência prática e qualificação, decidiu abrir seu próprio negócio para oferecer um atendimento mais próximo, ético e dedicado a cada cãozinho e seu tutor.</p>
+                    <p>Hoje, oferecemos não apenas adestramento personalizado, mas também um hotel para cães com todo o cuidado, conforto e segurança que eles merecem.</p>
+                </div>
+            </div>
+        </section>
+        
+        <div><h2>Nossos Serviços</h2></div>
+        <section id="servicos">
+            <div class="servico">
+                <img src="images/adestramento.png" alt="Adestramento de Cães">
+                <p>Oferecemos adestramento profissional para cães de todas as idades.</p>
+            </div>
+            <div class="servico">
+                <img src="images/hotel.jpg" alt="Hotel para Cães">
+                <p>Nosso hotel oferece um ambiente seguro e confortável para o seu pet.</p>
+            </div>
+            <div class="servico">
+                <img src="images/certificado.png" alt="Qualidade no trabalho">
+                <p>Temos profissionais certificados e capacitados para cuidar do seu pet.</p>
+            </div>
+        </section>
+        
+        <div><h3>Comentários dos nossos clientes</h3></div>
+
+        <aside>
+            <p>"Excelente serviço! Meu cachorro ama ficar no hotel." - Dona da Meg</p>
+        </aside>
+       
+         <aside>
+          <p>"Até o momento, é o melhor da região, foi a única que conseguiu tirar o comportamento agressivo do meu Pastor belga." - Dono do Jack</p>
+         </aside>
+        
+          <aside>
+            <p>"No começo eu achei que não iria dar certo o Bob se entrosar com outros cachorros, mas agora ele está amando brincar com eles." - Ricardo Vieira</p>
+           </aside>
+          
+    </main>
+
+    <form id="contato">
+        <h2>Entre em Contato</h2>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required>
+        
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="mensagem">Mensagem:</label>
+        <textarea id="mensagem" name="mensagem" required></textarea>
+        
+        <button type="submit">Enviar</button>
+    </form>
+    
+    <footer>
+        <p>Endereço: Rua dos Pets, 123 - Telefone: (11) 94251-0917</p>
+        <p>&copy; 2025 PetCare - Todos os direitos reservados</p>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/contato.js"></script>
+</body>
+</html>

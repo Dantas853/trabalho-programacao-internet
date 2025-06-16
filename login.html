@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tia Dre Adestramento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/Tia-Dre-Adestramento.png" alt="Logo com Escrita">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html#sobre">Sobre</a></li>
+        <li><a href="index.html#servicos">Serviços</a></li>
+        <li><a href="index.html#contato">Contato</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <!-- Seção de Benefícios -->
+    <section class="benefits-section">
+      <h2>Por que escolher nosso plano de adestramento?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <img src="/images/image1.png" alt="Treinamento Profissional">
+          <h4>Treinamento Profissional</h4>
+          <p>Métodos comprovados e personalizados para cada pet, com profissionais certificados e experientes.</p>
+        </div>
+        <div class="benefit-card">
+          <img src="/images/image2.png" alt="Acompanhamento Contínuo">
+          <h4>Acompanhamento Contínuo</h4>
+          <p>Suporte 24/7 e acompanhamento do progresso do seu pet através da nossa plataforma digital.</p>
+        </div>
+        <div class="benefit-card">
+          <img src="/images/image3.png" alt="Resultados Garantidos">
+          <h4>Resultados Garantidos</h4>
+          <p>Mais de 95% de sucesso nos casos tratados, com garantia de satisfação ou seu dinheiro de volta.</p>
+        </div>
+        <div class="benefit-card">
+          <img src="/images/image4.png" alt="Ambiente Seguro">
+          <h4>Ambiente Seguro</h4>
+          <p>Instalações modernas e seguras, com área de recreação e hotel para seu pet quando necessário.</p>
+        </div>
+        <div class="benefit-card">
+          <img src="/images/image5.png" alt="Preço Justo">
+          <h4>Preço Justo</h4>
+          <p>Planos flexíveis e preços acessíveis, com possibilidade de parcelamento sem juros.</p>
+        </div>
+        <div class="benefit-card">
+          <img src="/images/image6.png" alt="Comunidade">
+          <h4>Comunidade de Tutores</h4>
+          <p>Acesso exclusivo ao nosso grupo de tutores para trocar experiências e dicas.</p>
+        </div>
+      </div>
+    </section>
+
+    <form id="login-form">
+      <h2>Faça seu Login</h2>
+      <p style="text-align: center; margin-bottom: 2rem; color: #666;">Acesse sua conta e acompanhe o progresso do seu pet</p>
+      
+      <input type="email" id="email" placeholder="Seu melhor email" required />
+      <input type="password" id="password" placeholder="Sua senha segura" required />
+      <button type="submit">Entrar na Minha Conta</button>
+      <p class="form-footer">Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se gratuitamente</a></p>
+    </form>
+  </main>
+  
+  <footer>
+    <p>Endereço: Rua dos Pets, 123 - Telefone: (11) 94251-0917</p>
+    <p>&copy; 2025 Tia Dre Adestramento - Transformando vidas, um pet de cada vez</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicialização do cliente Supabase
+      const supabaseUrl = "https://czhablojniwloaugarfu.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aGFibG9qbml3bG9hdWdhcmZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTg5NDQsImV4cCI6MjA2NTE3NDk0NH0.Yw8t0I9X1QLhKhDaL4s_n8TzBspS_uKmp4iTMaHHeC8";
+      
+      const { createClient } = supabase;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+      
+      // Função para login
+      async function login(e) {
+        e.preventDefault();
+        
+        const button = document.querySelector('button[type="submit"]');
+        const originalText = button.textContent;
+        button.textContent = 'Entrando...';
+        button.disabled = true;
+        
+        try {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          
+          console.log("Tentando login com:", email);
+          
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ 
+            email, 
+            password 
+          });
+          
+          if (error) {
+            console.error("Erro no login:", error);
+            alert("Erro ao fazer login: " + error.message);
+          } else {
+            console.log("Login bem-sucedido:", data);
+            alert("Login realizado com sucesso! Bem-vindo de volta!");
+            window.location.href = "pts.html";
+          }
+        } catch (err) {
+          console.error("Exceção durante o login:", err);
+          alert("Erro inesperado: " + err.message);
+        } finally {
+          button.textContent = originalText;
+          button.disabled = false;
+        }
+      }
+
+      const form = document.getElementById('login-form');
+      if (form) {
+        form.addEventListener('submit', login);
+        console.log("Event listener de login adicionado");
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Pet - Tia Dre Adestramento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+  <style>
+    /* Estilos específicos para a tabela de pets */
+    .pets-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pets-table th, .pets-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .pets-table th {
+      background-color: var(--cor-primaria);
+      color: white;
+      font-weight: 500;
+    }
+    
+    .pets-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .pets-table tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .edit-btn, .delete-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border: none;
+    }
+    
+    .edit-btn {
+      background-color: var(--cor-destaque);
+      color: white;
+    }
+    
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .pets-section {
+      margin-top: 3rem;
+      padding: 1rem;
+      background-color: var(--cor-clara);
+      border-radius: 8px;
+    }
+    
+    .pets-section h2 {
+      margin-bottom: 1rem;
+      color: var(--cor-primaria);
+    }
+    
+    .no-pets {
+      text-align: center;
+      padding: 2rem;
+      color: #777;
+      font-style: italic;
+    }
+    
+    /* Estilos para o modal de confirmação */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .modal-buttons button {
+      padding: 8px 16px;
+    }
+    
+    .cancel-btn {
+      background-color: #95a5a6;
+    }
+    
+    .confirm-btn {
+      background-color: #e74c3c;
+    }
+    
+    /* Estilos para o botão de logout */
+    .logout-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: var(--cor-escura);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/Tia-Dre-Adestramento.png" alt="Logo com Escrita">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html#sobre">Sobre</a></li>
+        <li><a href="index.html#servicos">Serviços</a></li>
+        <li><a href="index.html#contato">Contato</a></li>
+      </ul>
+    </nav>
+    <button id="logout-btn" class="logout-btn">Sair</button>
+  </header>
+  
+  <main>
+    <form id="pet-form">
+      <h2>Cadastro de Pet</h2>
+      <input type="hidden" id="pet-id" value="">
+      <input type="text" id="nome" placeholder="Nome do Pet" required />
+      <input type="text" id="raca" placeholder="Raça" required />
+
+      <label for="idade">Idade:</label>
+      <input type="number" id="idade" placeholder="Informe em anos completos" required />
+
+      <label>Pet toma medicação?</label>
+      <select id="medicacao">
+        <option value="Não">Não</option>
+        <option value="Sim">Sim</option>
+      </select>
+
+      <input type="text" id="quais_medicacoes" placeholder="Quais medicações?" style="display: none;" />
+
+      <label for="problemas">Problemas comportamentais:</label>
+      <select id="problemas" multiple size="4">
+        <option value="Urinar no local errado">Urinar no local errado</option>
+        <option value="Agressividade">Agressividade</option>
+        <option value="Ansiedade de separação">Ansiedade de separação</option>
+        <option value="Latido excessivo">Latido excessivo</option>
+      </select>
+
+      <button type="submit" id="submit-btn">Cadastrar</button>
+      <button type="button" id="cancel-btn" style="display: none; background-color: #95a5a6;">Cancelar</button>
+    </form>
+    
+    <div class="responsive-table-container">
+      <section class="pets-section">
+       <h2>Seus Pets Cadastrados</h2>
+       <div id="pets-list">
+          <p class="no-pets">Carregando pets...</p>
+       </div>
+     </section>
+    </div>
+
+  </main>
+  
+  <!-- Modal de confirmação para exclusão -->
+  <div id="delete-modal" class="modal">
+    <div class="modal-content">
+      <h3>Confirmar Exclusão</h3>
+      <p>Tem certeza que deseja excluir este pet? Esta ação não pode ser desfeita.</p>
+      <div class="modal-buttons">
+        <button class="cancel-btn" id="modal-cancel">Cancelar</button>
+        <button class="confirm-btn" id="modal-confirm">Excluir</button>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>Endereço: Rua dos Pets, 123 - Telefone: (11) 94251-0917</p>
+    <p>&copy; 2025 PetCare - Todos os direitos reservados</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicialização do cliente Supabase
+      const supabaseUrl = "https://czhablojniwloaugarfu.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aGFibG9qbml3bG9hdWdhcmZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTg5NDQsImV4cCI6MjA2NTE3NDk0NH0.Yw8t0I9X1QLhKhDaL4s_n8TzBspS_uKmp4iTMaHHeC8";
+      
+      // CORREÇÃO: Inicializar o cliente Supabase corretamente
+      const { createClient } = supabase;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+      
+      // Elementos do DOM
+      const petForm = document.getElementById('pet-form');
+      const petsList = document.getElementById('pets-list');
+      const submitBtn = document.getElementById('submit-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const petIdInput = document.getElementById('pet-id');
+      const deleteModal = document.getElementById('delete-modal');
+      const modalCancel = document.getElementById('modal-cancel');
+      const modalConfirm = document.getElementById('modal-confirm');
+      const logoutBtn = document.getElementById('logout-btn');
+      
+      // Variável para armazenar o ID do pet a ser excluído
+      let petToDeleteId = null;
+      
+      // Verificar autenticação e carregar pets
+      checkAuthAndLoadPets();
+      
+      // Função para verificar autenticação e carregar pets
+      async function checkAuthAndLoadPets() {
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          
+          if (!session) {
+            alert("Você precisa estar logado para acessar esta página.");
+            window.location.href = "login.html";
+            return;
+          }
+          
+          // Carregar pets do usuário
+          loadUserPets();
+        } catch (err) {
+          console.error("Erro ao verificar autenticação:", err);
+          alert("Erro ao verificar autenticação: " + err.message);
+        }
+      }
+      
+      // Função para mostrar/esconder campo de medicações
+      const toggleMedicamentos = () => {
+        const medicacao = document.getElementById("medicacao").value;
+        document.getElementById("quais_medicacoes").style.display = medicacao === "Sim" ? "block" : "none";
+      }
+
+      // Configurar o evento change para o select de medicação
+      const medicacaoSelect = document.getElementById("medicacao");
+      if (medicacaoSelect) {
+        medicacaoSelect.addEventListener("change", toggleMedicamentos);
+        // Executar uma vez para configurar o estado inicial
+        toggleMedicamentos();
+      }
+      
+      // Função para carregar os pets do usuário
+      async function loadUserPets() {
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          
+          if (!session) return;
+          
+          const { data: pets, error } = await supabaseClient
+            .from('pets')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (error) {
+            console.error("Erro ao carregar pets:", error);
+            petsList.innerHTML = `<p class="no-pets">Erro ao carregar pets: ${error.message}</p>`;
+            return;
+          }
+          
+          if (!pets || pets.length === 0) {
+            petsList.innerHTML = '<p class="no-pets">Você ainda não cadastrou nenhum pet.</p>';
+            return;
+          }
+          
+          // Criar tabela de pets
+          let tableHTML = `
+            <table class="pets-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Raça</th>
+                  <th>Idade</th>
+                  <th>Medicação</th>
+                  <th>Problemas</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          
+          pets.forEach(pet => {
+            tableHTML += `
+              <tr>
+                <td>${pet.nome}</td>
+                <td>${pet.raca}</td>
+                <td>${pet.idade} ${pet.idade === 1 ? 'ano' : 'anos'}</td>
+                <td>${pet.medicacao}${pet.quais_medicacoes ? ': ' + pet.quais_medicacoes : ''}</td>
+                <td>${pet.problemas || 'Nenhum'}</td>
+                <td class="action-buttons">
+                  <button class="edit-btn" data-id="${pet.id}">Editar</button>
+                  <button class="delete-btn" data-id="${pet.id}">Excluir</button>
+                </td>
+              </tr>
+            `;
+          });
+          
+          tableHTML += `
+              </tbody>
+            </table>
+          `;
+          
+          petsList.innerHTML = tableHTML;
+          
+          // Adicionar event listeners para os botões de editar e excluir
+          document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const petId = e.target.getAttribute('data-id');
+              editPet(petId, pets.find(pet => pet.id === petId));
+            });
+          });
+          
+          document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const petId = e.target.getAttribute('data-id');
+              showDeleteConfirmation(petId);
+            });
+          });
+          
+        } catch (err) {
+          console.error("Erro ao carregar pets:", err);
+          petsList.innerHTML = `<p class="no-pets">Erro ao carregar pets: ${err.message}</p>`;
+        }
+      }
+      
+      // Função para preencher o formulário com os dados do pet para edição
+      function editPet(petId, pet) {
+        petIdInput.value = petId;
+        document.getElementById('nome').value = pet.nome;
+        document.getElementById('raca').value = pet.raca;
+        document.getElementById('idade').value = pet.idade;
+        document.getElementById('medicacao').value = pet.medicacao;
+        
+        if (pet.medicacao === 'Sim') {
+          document.getElementById('quais_medicacoes').value = pet.quais_medicacoes || '';
+          document.getElementById('quais_medicacoes').style.display = 'block';
+        } else {
+          document.getElementById('quais_medicacoes').value = '';
+          document.getElementById('quais_medicacoes').style.display = 'none';
+        }
+        
+        // Selecionar os problemas comportamentais
+        const problemasSelect = document.getElementById('problemas');
+        const problemasList = pet.problemas ? pet.problemas.split(', ') : [];
+        
+        // Desmarcar todas as opções primeiro
+        for (let i = 0; i < problemasSelect.options.length; i++) {
+          problemasSelect.options[i].selected = false;
+        }
+        
+        // Marcar as opções correspondentes
+        for (let i = 0; i < problemasSelect.options.length; i++) {
+          if (problemasList.includes(problemasSelect.options[i].value)) {
+            problemasSelect.options[i].selected = true;
+          }
+        }
+        
+        // Mudar o texto do botão e mostrar o botão de cancelar
+        submitBtn.textContent = 'Atualizar';
+        cancelBtn.style.display = 'inline-block';
+        
+        // Rolar para o topo do formulário
+        petForm.scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // Função para mostrar o modal de confirmação de exclusão
+      function showDeleteConfirmation(petId) {
+        petToDeleteId = petId;
+        deleteModal.style.display = 'flex';
+      }
+      
+      // Função para cadastrar ou atualizar um pet
+      async function handlePetSubmit(e) {
+        e.preventDefault();
+        
+        // Mostrar feedback visual
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = petIdInput.value ? 'Atualizando...' : 'Cadastrando...';
+        submitBtn.disabled = true;
+        
+        try {
+          // Verificar se o usuário está autenticado
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          
+          if (!session) {
+            alert("Você precisa estar logado para cadastrar um pet.");
+            window.location.href = "login.html";
+            return;
+          }
+          
+          const nome = document.getElementById("nome").value;
+          const raca = document.getElementById("raca").value;
+          const idade = Number.parseInt(document.getElementById("idade").value);
+          const medicacao = document.getElementById("medicacao").value;
+          const quais_medicacoes = document.getElementById("quais_medicacoes").value;
+          
+          const problemasSelect = document.getElementById("problemas");
+          const problemas = Array.from(problemasSelect.selectedOptions)
+            .map((option) => option.value)
+            .join(", ");
+          
+          const petData = {
+            nome,
+            raca,
+            idade,
+            medicacao,
+            quais_medicacoes: medicacao === "Sim" ? quais_medicacoes : "",
+            problemas,
+            user_id: session.user.id
+          };
+          
+          let error;
+          
+          // Verificar se é uma atualização ou um novo cadastro
+          if (petIdInput.value) {
+            // Atualização
+            const { error: updateError } = await supabaseClient
+              .from("pets")
+              .update(petData)
+              .eq('id', petIdInput.value);
+              
+            error = updateError;
+            
+            if (!error) {
+              alert("Pet atualizado com sucesso!");
+            }
+          } else {
+            // Novo cadastro
+            const { error: insertError } = await supabaseClient
+              .from("pets")
+              .insert([petData]);
+              
+            error = insertError;
+            
+            if (!error) {
+              alert("Pet cadastrado com sucesso!");
+            }
+          }
+          
+          if (error) {
+            console.error("Erro ao salvar pet:", error);
+            alert("Erro ao salvar pet: " + error.message);
+          } else {
+            // Limpar formulário e resetar estado
+            resetForm();
+            // Recarregar lista de pets
+            loadUserPets();
+          }
+        } catch (err) {
+          console.error("Exceção durante o salvamento do pet:", err);
+          alert("Erro inesperado: " + err.message);
+        } finally {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }
+      }
+      
+      // Função para excluir um pet
+      async function deletePet(petId) {
+        try {
+          const { error } = await supabaseClient
+            .from("pets")
+            .delete()
+            .eq('id', petId);
+            
+          if (error) {
+            console.error("Erro ao excluir pet:", error);
+            alert("Erro ao excluir pet: " + error.message);
+          } else {
+            alert("Pet excluído com sucesso!");
+            // Recarregar lista de pets
+            loadUserPets();
+          }
+        } catch (err) {
+          console.error("Exceção durante a exclusão do pet:", err);
+          alert("Erro inesperado: " + err.message);
+        } finally {
+          // Fechar o modal
+          deleteModal.style.display = 'none';
+        }
+      }
+      
+      // Função para resetar o formulário
+      function resetForm() {
+        petForm.reset();
+        petIdInput.value = '';
+        submitBtn.textContent = 'Cadastrar';
+        cancelBtn.style.display = 'none';
+        toggleMedicamentos();
+      }
+      
+      // Função para fazer logout
+      async function logout() {
+        try {
+          const { error } = await supabaseClient.auth.signOut();
+          
+          if (error) {
+            console.error("Erro ao fazer logout:", error);
+            alert("Erro ao fazer logout: " + error.message);
+          } else {
+            alert("Logout realizado com sucesso!");
+            window.location.href = "index.html";
+          }
+        } catch (err) {
+          console.error("Exceção durante o logout:", err);
+          alert("Erro inesperado: " + err.message);
+        }
+      }
+      
+      // Event listeners
+      if (petForm) {
+        petForm.addEventListener('submit', handlePetSubmit);
+      }
+      
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', resetForm);
+      }
+      
+      if (modalCancel) {
+        modalCancel.addEventListener('click', () => {
+          deleteModal.style.display = 'none';
+        });
+      }
+      
+      if (modalConfirm) {
+        modalConfirm.addEventListener('click', () => {
+          if (petToDeleteId) {
+            deletePet(petToDeleteId);
+          }
+        });
+      }
+      
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+      }
+      
+      // Fechar o modal se clicar fora dele
+      window.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

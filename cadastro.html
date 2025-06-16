@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Tia Dre Adestramento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/Tia-Dre-Adestramento.png" alt="Logo com Escrita">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html#sobre">Sobre</a></li>
+        <li><a href="index.html#servicos">Serviços</a></li>
+        <li><a href="index.html#contato">Contato</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <form id="cadastro-form">
+      <h2>Cadastro</h2>
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Senha" required />
+      <button type="submit">Cadastrar</button>
+      <p class="form-footer">Já tem uma conta? <a href="login.html">Faça login</a></p>
+    </form>
+  </main>
+  
+  <footer>
+    <p>Endereço: Rua dos Pets, 123 - Telefone: (11) 94251-0917</p>
+    <p>&copy; 2025 PetCare - Todos os direitos reservados</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicialização do cliente Supabase
+      const supabaseUrl = "https://czhablojniwloaugarfu.supabase.co"; // URL do supabase
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aGFibG9qbml3bG9hdWdhcmZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTg5NDQsImV4cCI6MjA2NTE3NDk0NH0.Yw8t0I9X1QLhKhDaL4s_n8TzBspS_uKmp4iTMaHHeC8"; // Chave do supabase ANON
+      
+      // Inicializar o cliente Supabase corretamente
+      const { createClient } = supabase;
+      const supabaseClient = createClient(supabaseUrl, supabaseKey);
+      
+      // Função para cadastrar usuário
+      async function cadastrar(e) {
+        e.preventDefault();
+        
+        // Mostrar feedback visual
+        const button = document.querySelector('button[type="submit"]');
+        const originalText = button.textContent;
+        button.textContent = 'Cadastrando...';
+        button.disabled = true;
+        
+        try {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          
+          console.log("Tentando cadastrar:", email); // Log para debug
+          
+          const { data, error } = await supabaseClient.auth.signUp({ 
+            email, 
+            password,
+            options: {
+              emailRedirectTo: window.location.origin
+            }
+          });
+          
+          if (error) {
+            console.error("Erro no cadastro:", error);
+            alert("Erro ao cadastrar: " + error.message);
+          } else {
+            console.log("Cadastro bem-sucedido:", data);
+            alert("Usuário cadastrado com sucesso!");
+            window.location.href = "login.html";
+          }
+        } catch (err) {
+          console.error("Exceção durante o cadastro:", err);
+          alert("Erro inesperado: " + err.message);
+        } finally {
+          button.textContent = originalText;
+          button.disabled = false;
+        }
+      }
+
+      // Adicionar event listener ao formulário
+      const form = document.getElementById('cadastro-form');
+      if (form) {
+        form.addEventListener('submit', cadastrar);
+        console.log("Event listener de cadastro adicionado");
+      }
+    });
+  </script>
+</body>
+</html>
