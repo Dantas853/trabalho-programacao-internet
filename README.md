@@ -4,6 +4,6 @@ Feito um site para quem procura o adestramento de cães com a opção de cadastr
 
 elaborado por:
 
-Anderson Dantas Vieira
-Alessandra do Nascimento
+Anderson Dantas Vieira /
+Alessandra do Nascimento /
 Caio Maragola
